@@ -31,6 +31,8 @@ contract MyEpicNFT is ERC721URIStorage {
   string[] secondWords = ["Tristania","Upwrench","Unbleaching","Wigful","Octolateral","Downstage","Agrostographer","Therologist","Anomorhomboidal","Elephantry","Diactinal","Rapturist","Wirelike","Welshery","Despisable","Oppilate","Countervenom","Ethid","Graphite","Unearth","Paleophytologist","Decapsulate","Sellout","Idryl","Syntactics","Filix","Campcraft","Contributional","Ninnywatch","Plantago"];
   string[] thirdWords = ["Spironema","Anarthrousness","Carnose","Scotchness","Tripel","Indefatigably","Craber","Unsecured","Prosopantritis","Interfollicular","Prescutal","Circummundane","Roughcaster","Helply","Subhepatic","Pistillody","Subordinate","Muciform","Fasciately","Insectival","Unteasled","Craterellus","Camerated","Collegiation","Duster","Bibliothec","Jutish","Micawberish","Rookeried","Teleosteous"];
 
+  event NewEpicNFTMinted(address sender, uint256 tokenId);
+
   // NFT トークンの名前とそのシンボルを渡します。
   constructor() ERC721 ("SquareNFT", "SQUARE") {
     console.log("This is my NFT contract.");
@@ -129,5 +131,6 @@ contract MyEpicNFT is ERC721URIStorage {
 
     // 次の NFT が Mint されるときのカウンターをインクリメントする。
     _tokenIds.increment();
+    emit NewEpicNFTMinted(msg.sender, newItemId);
   }
 }
