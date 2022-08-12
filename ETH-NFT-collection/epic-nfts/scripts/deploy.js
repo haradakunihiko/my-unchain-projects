@@ -20,6 +20,8 @@ const main = async () => {
   // Minting が仮想マイナーにより、承認されるのを待ちます。
   await txn.wait();
   console.log("Minted NFT #1");
+  cnt = await nftContract.getCurrentCount();
+  console.log("current token minted: " + cnt);
 };
 // エラー処理を行っています。
 const runMain = async () => {

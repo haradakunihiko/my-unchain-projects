@@ -73,6 +73,12 @@ contract MyEpicNFT is ERC721URIStorage {
     return thirdWords[rand];
   }
 
+
+  // ユーザーが NFT を取得するために実行する関数です。
+  function getCurrentCount() public view returns (uint256) {
+    return _tokenIds.current();
+  }
+
   // ユーザーが NFT を取得するために実行する関数です。
   function makeAnEpicNFT() public {
     // 現在のtokenIdを取得します。tokenIdは0から始まります。

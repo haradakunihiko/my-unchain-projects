@@ -1,12 +1,17 @@
+// hardhat.config.js
+require("@nomiclabs/hardhat-etherscan");
 require("@nomicfoundation/hardhat-toolbox");
+require("dotenv").config();
 
-/** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.9",
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_APIKEY
+  },
   networks: {
     rinkeby: {
-      url: "https://eth-rinkeby.alchemyapi.io/v2/Ah5tyekDMDmhnWGqFq4HnNipeScLdIOo",
-      accounts: ["c6ab7688a2dc18ad8a37925ed97dd729a337ea279116874ee30785ae20b37d23"],
+      url: process.env.STAGING_ALCHEMY_KEY,
+      accounts: [process.env.PRIVATE_KEY],
     },
   },
 };

@@ -14,6 +14,9 @@ const main = async () => {
   txn = await nftContract.makeAnEpicNFT();
   // Minting が仮想マイナーにより、承認されるのを待つ。
   await txn.wait();
+
+  cnt = await nftContract.getCurrentCount();
+  console.log("current token minted: " + cnt);
 };
 const runMain = async () => {
   try {

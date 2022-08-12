@@ -7,18 +7,20 @@ import React, { useEffect, useState } from "react";
 import "./styles/App.css";
 import twitterLogo from "./assets/twitter-logo.svg";
 // Constantsを宣言する: constとは値書き換えを禁止した変数を宣言する方法です。
-const TWITTER_HANDLE = "あなたのTwitterのハンドルネームを貼り付けてください";
+const TWITTER_HANDLE = "sthsoulful";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 const OPENSEA_LINK = "";
 const TOTAL_MINT_COUNT = 50;
 const CONTRACT_ADDRESS =
-"0x23e0f8B142CfCB5dF9745474C235A6D3C715d0fC";
+"0x4DB4025212D1762Dab8e7D137a82dDEB2B0447A9";
 
 const App = () => {
   /*
    * ユーザーのウォレットアドレスを格納するために使用する状態変数を定義します。
    */
   const [currentAccount, setCurrentAccount] = useState("");
+
+  const [currentMintCount, setCurrentMintCount] = useState(0);
   /*この段階でcurrentAccountの中身は空*/
   console.log("currentAccount: ", currentAccount);
   /*
@@ -32,6 +34,7 @@ const App = () => {
     } else {
       console.log("We have the ethereum object", ethereum);
     }
+
     /* ユーザーが認証可能なウォレットアドレスを持っている場合は、
      * ユーザーに対してウォレットへのアクセス許可を求める。
      * 許可されれば、ユーザーの最初のウォレットアドレスを
@@ -40,9 +43,19 @@ const App = () => {
     const accounts = await ethereum.request({ method: "eth_accounts" });
 
     if (accounts.length !== 0) {
+      let chainId = await ethereum.request({ method: "eth_chainId" });
+      console.log("Connected to chain " + chainId);
+      // 0x4 は　Rinkeby の ID です。
+      const rinkebyChainId = "0x4";
+      if (chainId !== rinkebyChainId) {
+        alert("You are not connected to the Rinkeby Test Network!");
+        return;
+      }
+
       const account = accounts[0];
       console.log("Found an authorized account:", account);
       setCurrentAccount(account);
+      askContractMintedCount();
 
       setupEventListener();
     } else {
@@ -60,6 +73,16 @@ const App = () => {
         alert("Get MetaMask!");
         return;
       }
+
+      let chainId = await ethereum.request({ method: "eth_chainId" });
+      console.log("Connected to chain " + chainId);
+      // 0x4 は　Rinkeby の ID です。
+      const rinkebyChainId = "0x4";
+      if (chainId !== rinkebyChainId) {
+        alert("You are not connected to the Rinkeby Test Network!");
+        return;
+      }  
+
       /*
        * ウォレットアドレスに対してアクセスをリクエストしています。
        */
@@ -72,6 +95,8 @@ const App = () => {
        */
       setCurrentAccount(accounts[0]);
       setupEventListener();
+
+      await askContractMintedCount();
     } catch (error) {
       console.log(error);
     }
@@ -105,6 +130,35 @@ const askContractToMintNft = async () => {
     console.log(error);
   }
 };
+
+  // App.js
+  const askContractMintedCount = async () => {
+
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const connectedContract = new ethers.Contract(
+          CONTRACT_ADDRESS,
+          myEpicNft.abi,
+          signer
+        );
+        console.log("Going to get current count...");
+        const mintedCount = await connectedContract.getCurrentCount();
+      
+        setCurrentMintCount(mintedCount);
+
+        console.log(
+          `Current count:${mintedCount}`
+        );
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
 // setupEventListener 関数を定義します。
 // MyEpicNFT.sol の中で event が　emit された時に、
@@ -148,7 +202,7 @@ const setupEventListener = async () => {
   /*
    * ページがロードされたときに useEffect()内の関数が呼び出されます。
    */
-  useEffect(() => {
+  useEffect(() =>  {
     checkIfWalletIsConnected();
   }, []);
   return (
@@ -163,9 +217,16 @@ const setupEventListener = async () => {
           {currentAccount === "" ? (
             renderNotConnectedContainer()
           ) : (
-            <button onClick={askContractToMintNft} className="cta-button connect-wallet-button">
-              Mint NFT
-            </button>
+            <div>
+              <div className="sub-text">
+                {currentMintCount && `${currentMintCount.toNumber()} nft mintted.`} 
+              </div>
+              <div>
+                <button onClick={askContractToMintNft} className="cta-button connect-wallet-button">
+                  Mint NFT
+                </button>
+              </div>
+            </div>
           )}
         </div>
         <div className="footer-container">
